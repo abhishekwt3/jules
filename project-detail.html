@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ledger — Case Study · Jules Tanaka</title>
+<link rel="stylesheet" href="assets/brutal.css" />
+<style>
+  /* ---- project hero ---- */
+  .crumbs { font-family: var(--mono); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; display: flex; gap: 10px; align-items: center; }
+  .crumbs a { border-bottom: 2px solid transparent; }
+  .crumbs a:hover { border-color: var(--ink); }
+  .crumbs .sep { opacity: .5; }
+
+  .phero { padding: 56px 0 72px; position: relative; overflow: hidden; }
+  .phero .blob { position: absolute; right: -60px; top: -40px; width: 280px; height: 280px; background: var(--yellow); border: var(--bw) solid var(--ink); transform: rotate(14deg); z-index: 0; }
+  .phero-inner { position: relative; z-index: 2; }
+  .ptitle { font-size: clamp(64px, 13vw, 184px); margin: 22px 0 0; }
+  .psub { font-size: clamp(19px, 2.4vw, 26px); line-height: 1.4; font-weight: 500; max-width: 44ch; margin-top: 24px; }
+
+  .meta-band { display: grid; grid-template-columns: repeat(4, 1fr); border: var(--bw) solid var(--ink); box-shadow: var(--shadow) var(--shadow) 0 var(--ink); background: var(--panel); margin-top: 44px; }
+  .meta-band .m { padding: 20px 22px; border-right: var(--bw) solid var(--ink); }
+  .meta-band .m:last-child { border-right: none; }
+  .meta-band .mh { font-family: var(--mono); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: .55; margin-bottom: 8px; }
+  .meta-band .mv { font-family: var(--disp); font-weight: 800; font-size: 19px; line-height: 1.15; }
+
+  .bigshot { border: var(--bw) solid var(--ink); border-left: none; border-right: none; min-height: 460px; }
+
+  /* content */
+  .content { display: grid; grid-template-columns: 300px 1fr; gap: 56px; align-items: start; }
+  .content .side { position: sticky; top: 96px; display: flex; flex-direction: column; gap: 18px; }
+  .content .side .skey { font-family: var(--mono); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: .55; }
+  .content .side ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .content .side ul li { font-family: var(--mono); font-size: 14px; padding: 9px 12px; border: var(--bw) solid var(--ink); background: var(--panel); }
+  .content .side ul li b { color: var(--pink); }
+  .prose { display: flex; flex-direction: column; gap: 40px; }
+  .block h3 { font-family: var(--disp); font-weight: 900; font-size: clamp(28px,3.6vw,44px); text-transform: uppercase; letter-spacing: -1px; margin: 0 0 16px; line-height: .98; }
+  .block h3 .no { color: var(--pink); margin-right: 12px; }
+  .block p { font-size: 19px; line-height: 1.65; margin: 0 0 14px; }
+  .block p + p { margin-top: 0; }
+  .pull { border-left: 8px solid var(--pink); background: var(--panel); border-top: var(--bw) solid var(--ink); border-right: var(--bw) solid var(--ink); border-bottom: var(--bw) solid var(--ink); padding: 22px 26px; font-family: var(--disp); font-weight: 800; font-size: clamp(22px,2.6vw,30px); line-height: 1.2; text-transform: uppercase; letter-spacing: -.5px; box-shadow: var(--shadow) var(--shadow) 0 var(--ink); }
+
+  /* build log terminal */
+  .buildlog { margin-top: 8px; }
+
+  /* gallery */
+  .gallery { display: grid; grid-template-columns: 2fr 1fr; gap: 26px; }
+  .gallery .g2 { display: grid; grid-template-rows: 1fr 1fr; gap: 26px; }
+  .gallery .ph { min-height: 300px; }
+  .gallery .g2 .ph { min-height: 0; }
+
+  /* results band */
+  .results { background: var(--yellow); border-top: var(--bw) solid var(--ink); border-bottom: var(--bw) solid var(--ink); }
+  .results .rgrid { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .results .r { padding: 56px 28px; border-right: var(--bw) solid var(--ink); }
+  .results .r:last-child { border-right: none; }
+  .results .rn { font-family: var(--disp); font-weight: 900; font-size: clamp(52px,8vw,96px); line-height: .85; letter-spacing: -3px; }
+  .results .rl { font-family: var(--mono); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-top: 14px; }
+
+  /* next project */
+  .nextp { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 56px 0; }
+  .nextp .nplab { font-family: var(--mono); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; opacity: .6; }
+  .nextp .npt { font-family: var(--disp); font-weight: 900; font-size: clamp(48px,9vw,118px); text-transform: uppercase; letter-spacing: -3px; line-height: .9; display: inline-flex; align-items: center; gap: 24px; transition: transform .16s, color .16s; }
+  .nextp a:hover .npt { color: var(--pink); transform: translateX(10px); }
+
+  @media (max-width: 920px) {
+    .meta-band, .results .rgrid { grid-template-columns: 1fr 1fr; }
+    .meta-band .m { border-bottom: var(--bw) solid var(--ink); }
+    .content { grid-template-columns: 1fr; }
+    .content .side { position: static; }
+    .gallery { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) { .meta-band { grid-template-columns: 1fr; } .results .rgrid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav class="nav">
+  <a class="brand" href="index.html">jules<b>.</b>tanaka<span class="cursor" style="height:15px;margin-left:3px;vertical-align:middle"></span></a>
+  <div class="navlinks">
+    <a href="index.html#work">Work</a>
+    <a href="index.html#about">About</a>
+    <a href="index.html#words">Words</a>
+    <a class="cta" href="index.html#contact">Contact ↗</a>
+  </div>
+</nav>
+
+<!-- ===== PROJECT HERO ===== -->
+<header class="phero">
+  <div class="blob" data-parallax="0.12"></div>
+  <div class="wrap phero-inner">
+    <div class="crumbs reveal"><a href="index.html#work">Work</a><span class="sep">/</span><span>Case Study</span><span class="sep">/</span><span style="color:var(--pink)">Ledger</span></div>
+    <h1 class="h-display ptitle reveal d1">Ledger</h1>
+    <p class="psub reveal d2">An open-source <span class="mark">double-entry accounting engine</span> compiled to WebAssembly — books that balance in the browser, with zero backend.</p>
+    <div class="meta-band reveal d3">
+      <div class="m"><div class="mh">Role</div><div class="mv">Lead Engineer</div></div>
+      <div class="m"><div class="mh">Year</div><div class="mv">2025</div></div>
+      <div class="m"><div class="mh">Stack</div><div class="mv">Rust · WASM · TS</div></div>
+      <div class="m"><div class="mh">Links</div><div class="mv" style="color:var(--pink)">GitHub ↗ · Demo ↗</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== HERO SHOT ===== -->
+<div class="ph bigshot reveal" style="background-color:var(--pink)"><span class="ph-tag">hero screenshot · ledger dashboard · 1600×900</span></div>
+
+<!-- ===== MARQUEE ===== -->
+<div class="marquee alt">
+  <div class="track">
+    <span>Case Study <b>✦</b></span><span>Open Source <b>✦</b></span><span>6.2k Stars <b>✦</b></span><span>Rust + WASM <b>✦</b></span><span>Zero Backend <b>✦</b></span><span>Ledger v2 <b>✦</b></span>
+    <span>Case Study <b>✦</b></span><span>Open Source <b>✦</b></span><span>6.2k Stars <b>✦</b></span><span>Rust + WASM <b>✦</b></span><span>Zero Backend <b>✦</b></span><span>Ledger v2 <b>✦</b></span>
+  </div>
+</div>
+
+<!-- ===== CONTENT ===== -->
+<section class="section">
+  <div class="wrap content">
+    <aside class="side reveal">
+      <div class="skey">// On this page</div>
+      <ul>
+        <li><b>01</b> &nbsp;The Problem</li>
+        <li><b>02</b> &nbsp;The Approach</li>
+        <li><b>03</b> &nbsp;The Outcome</li>
+      </ul>
+      <div class="skey" style="margin-top:14px">// Contributions</div>
+      <ul>
+        <li>Engine architecture</li>
+        <li>WASM bindings</li>
+        <li>TypeScript SDK</li>
+        <li>Docs &amp; DX</li>
+      </ul>
+    </aside>
+
+    <div class="prose">
+      <div class="block reveal">
+        <h3><span class="no">01</span>The Problem</h3>
+        <p>Every accounting tool I'd used shipped a heavy backend just to add two numbers and make sure they balanced. For small apps, indie tools, and offline-first products, that's a tax — a server, a database, a migration story — before you've recorded a single transaction.</p>
+        <p>I wanted a ledger you could drop into any app: correct by construction, fast enough to feel instant, and small enough to run entirely client-side.</p>
+      </div>
+
+      <div class="pull reveal">"It should be impossible to write books that don't balance — the type system, not the test suite, should enforce it."</div>
+
+      <div class="block reveal">
+        <h3><span class="no">02</span>The Approach</h3>
+        <p>I built the core engine in Rust, modelling accounts, entries, and postings as types where an unbalanced transaction simply doesn't compile into a valid state. The engine compiles to a ~90KB WASM module with a thin TypeScript SDK on top, so it feels like calling any other JS library.</p>
+        <p>Persistence is pluggable — IndexedDB by default, but anything that can store bytes works. The whole thing runs in a web worker so the UI never blocks, even when replaying years of transactions.</p>
+      </div>
+
+      <div class="term buildlog reveal">
+        <div class="term-bar"><span class="tl r"></span><span class="tl y"></span><span class="tl g"></span><span class="ttl">cargo build --target wasm32</span></div>
+        <div class="term-body">
+          <div><span class="cm"># compiling the core engine</span></div>
+          <div><span class="gr">   Compiling</span> ledger-core v2.0.1</div>
+          <div><span class="gr">   Compiling</span> ledger-wasm v2.0.1</div>
+          <div><span class="gr">    Finished</span> release [optimized] in 4.21s</div>
+          <div><span class="st">  wasm size</span>: 88.4 KB (gzip 31.2 KB)</div>
+          <div><span class="st">  invariants</span>: <span class="gr">✓ 142 passed</span></div>
+          <div><span class="pr">$</span> <span class="cursor"></span></div>
+        </div>
+      </div>
+
+      <div class="block reveal">
+        <h3><span class="no">03</span>The Outcome</h3>
+        <p>Ledger now powers a handful of indie finance apps and crossed 6,000 GitHub stars in its first year. The thing I'm proudest of isn't the stars — it's the issues that <em>aren't</em> filed. Nobody reports unbalanced books, because they can't happen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GALLERY ===== -->
+<section class="section" style="padding-top:0;border-top:none">
+  <div class="wrap">
+    <div class="eyebrow reveal" style="margin-bottom:28px">Selected screens</div>
+    <div class="gallery">
+      <div class="ph paper reveal"><span class="ph-tag">transaction view · 1200×900</span></div>
+      <div class="g2">
+        <div class="ph reveal d1"><span class="ph-tag">account tree</span></div>
+        <div class="ph pink reveal d2"><span class="ph-tag">balance report</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RESULTS ===== -->
+<section class="results reveal">
+  <div class="wrap"><div class="rgrid">
+    <div class="r"><div class="rn">6.2k</div><div class="rl">GitHub stars</div></div>
+    <div class="r"><div class="rn">88<span style="font-size:.5em">KB</span></div><div class="rl">WASM bundle, gzipped 31KB</div></div>
+    <div class="r"><div class="rn">0</div><div class="rl">Unbalanced-book bugs filed</div></div>
+  </div></div>
+</section>
+
+<!-- ===== NEXT PROJECT ===== -->
+<section class="section">
+  <div class="wrap nextp">
+    <div>
+      <div class="nplab reveal">Next case study →</div>
+      <a href="project-detail.html" class="reveal d1"><span class="npt">Drift <span style="font-size:.6em">↗</span></span></a>
+    </div>
+    <a class="btn ghost reveal d2" href="index.html#work">← All work</a>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="foot" id="contact">
+  <div class="wrap foot-inner" style="padding:72px 0 40px">
+    <div class="foot-cta">
+      <div class="eyebrow reveal" style="background:var(--yellow);color:var(--ink)">Let's build</div>
+      <a class="bigmail reveal d1" href="mailto:hey@jules.dev">hey@jules.dev</a>
+    </div>
+    <div class="footrow reveal d2">
+      <a href="#">GitHub ↗</a>
+      <a href="#">LinkedIn ↗</a>
+      <a href="#">Twitter / X ↗</a>
+      <a href="#">Read.cv ↗</a>
+    </div>
+    <div class="foot-bottom">
+      <div class="cp">© 2025 Jules Tanaka — built from scratch, no template.</div>
+      <div class="cp">Made with caffeine &amp; &lt;3</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== TWEAKS ISLAND ===== -->
+<div id="tweaks-root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="assets/tweaks-app.jsx"></script>
+
+<!-- ===== INTERACTIONS ===== -->
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+  const pxEls = [...document.querySelectorAll('[data-parallax]')];
+  let ticking = false;
+  function applyParallax() {
+    const calm = document.body.classList.contains('motion-calm') || document.body.classList.contains('motion-off');
+    const y = window.scrollY;
+    pxEls.forEach((el) => {
+      const f = calm ? 0 : parseFloat(el.getAttribute('data-parallax'));
+      el.style.translate = `0px ${(y * f).toFixed(1)}px`;
+    });
+    ticking = false;
+  }
+  window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(applyParallax); } }, { passive: true });
+  applyParallax();
+</script>
+</body>
+</html>
